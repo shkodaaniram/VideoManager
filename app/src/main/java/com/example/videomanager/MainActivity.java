@@ -1,11 +1,17 @@
 package com.example.videomanager;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.TextureView;
+import android.widget.TabHost;
 
 import java.io.IOException;
 
@@ -14,7 +20,8 @@ import java.io.IOException;
  * <p>
  * TODO: add options for different display sizes, frame rates, camera selection, etc.
  */
-public class MainActivity extends Activity implements TextureView.SurfaceTextureListener {
+public class MainActivity extends ActionBarActivity implements TextureView.SurfaceTextureListener {
+
     private static final String TAG = MainActivity.TAG;
 
     private Camera mCamera;
@@ -23,11 +30,13 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        /*setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
         mTextureView = new TextureView(this);
         mTextureView.setSurfaceTextureListener(this);
 
-        setContentView(mTextureView);
+        setContentView(mTextureView);*/
     }
 
     @Override
@@ -67,6 +76,29 @@ public class MainActivity extends Activity implements TextureView.SurfaceTexture
     public void onSurfaceTextureUpdated(SurfaceTexture surface) {
         // Invoked every time there's a new Camera preview frame
         //Log.d(TAG, "updated, ts=" + surface.getTimestamp());
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_start, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }
 

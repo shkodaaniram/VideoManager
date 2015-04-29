@@ -1,5 +1,6 @@
 package com.example.videomanager;
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
@@ -14,7 +15,7 @@ import android.widget.ImageView;
 import android.view.View.OnClickListener;
 
 
-public class StartActivity extends ActionBarActivity implements OnClickListener {
+public class StartActivity extends Activity implements OnClickListener {
 
     ImageButton signGoogleBtn;
 
@@ -30,7 +31,7 @@ public class StartActivity extends ActionBarActivity implements OnClickListener 
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.signGoogleBtn:
-                Intent intent = new Intent(this, MainActivity.class);
+                Intent intent = new Intent(this, MenuActivity.class);
                 startActivity(intent);
                 break;
             default:
@@ -39,7 +40,7 @@ public class StartActivity extends ActionBarActivity implements OnClickListener 
     }
 
 
-    @Override
+    /*@Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_start, menu);
@@ -59,5 +60,5 @@ public class StartActivity extends ActionBarActivity implements OnClickListener 
         }
 
         return super.onOptionsItemSelected(item);
-    }
+    }*/
 }

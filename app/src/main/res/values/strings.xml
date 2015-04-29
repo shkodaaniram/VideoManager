@@ -1,7 +1,10 @@
 <resources>
-    <string name="app_name">VideoManager</string>
+    <string name="app_name">Video Manager</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_start">start activity</string>
+    <string name="title_activity_filters">Filters</string>
 
     <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
-    <string name="title_activity_start">StartActivity</string>
+    <string name="title_activity_menu">MenuActivity</string>
 </resources>
