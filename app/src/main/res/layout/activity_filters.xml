@@ -4,7 +4,7 @@
     android:paddingRight="0dp"
     android:paddingTop="0dp"
     android:paddingBottom="0dp"
-    android:background="@drawable/background3"
+    android:background="#ff000000"
 
     tools:context="com.example.videomanager.FiltersActivity">
 
@@ -23,21 +23,23 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true">
+            android:layout_alignParentLeft="true">
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:id="@+id/filter_none"
                 android:minWidth="70dp"
                 android:minHeight="50dp"/>
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:id="@+id/filter_sepia"
                 android:minWidth="70dp"
                 android:minHeight="50dp"/>
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:id="@+id/filter_aqua"
                 android:minWidth="70dp"
                 android:minHeight="50dp"/>
             <ImageButton
@@ -62,18 +64,6 @@
                 android:minHeight="50dp" />
         </LinearLayout>
     </HorizontalScrollView>
-
-    <VideoView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/videoView"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:layout_marginLeft="0dp"
-        android:layout_marginRight="0dp"
-        android:layout_marginTop="0dp"
-        android:layout_marginBottom="92dp" />
 
     <LinearLayout
         android:orientation="horizontal"
@@ -105,7 +95,7 @@
             android:layout_weight="0.5"/>
     </LinearLayout>
 
-    <TextureView
+    <SurfaceView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/cameraPreview"
@@ -117,6 +107,19 @@
         android:layout_marginLeft="0dp"
         android:layout_marginRight="0dp"
         android:layout_marginTop="0dp"
-        android:layout_marginBottom="92dp"/>
+        android:layout_marginBottom="92dp" />
+
+    <VideoView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/videoView"
+        android:layout_gravity="center"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="0dp"
+        android:layout_marginRight="0dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginBottom="92dp"
+        android:layout_alignParentTop="true"/>
 
 </RelativeLayout>
