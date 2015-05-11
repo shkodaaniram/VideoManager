@@ -178,12 +178,12 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
                     MediaController mediaController = new MediaController(
                             FiltersActivity.this);
                     mediaController.setAnchorView(videoView);
-                    //Uri video = Uri.parse(Environment.getExternalStorageDirectory()+"/Videos/Despicable-Me-2");
-                    Uri video = Uri.parse("http://www.androidbegin.com/tutorial/AndroidCommercial.3gp");
+                    Uri video = Uri.parse(Environment.getExternalStorageDirectory()+"/Videos/Despicable-Me-2");
+                    //Uri video = Uri.parse("http://www.androidbegin.com/tutorial/AndroidCommercial.3gp");
                     //Environment.getExternalStorageDirectory().getAbsolutePath()
                     videoView.setMediaController(mediaController);
                     videoView.setVideoURI(video);
-                   // videoView.setVideoPath(Environment.getExternalStorageDirectory().getPath()+"/Videos/Despicable-Me-2");
+                    //videoView.setVideoPath(Environment.getExternalStorageDirectory()+"/sdcard/Videos/Despicable-Me-2");
 
 
                 } catch (Exception e) {
