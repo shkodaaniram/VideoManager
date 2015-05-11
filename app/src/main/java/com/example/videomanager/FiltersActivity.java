@@ -77,9 +77,6 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
         filter_aquaBtn.setOnClickListener(this);
 
         videoView = (VideoView)findViewById(R.id.videoView);
-        //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-
-       // mTextureView = new TextureView(this);
 
         surfaceView = (SurfaceView)findViewById(R.id.cameraPreview);
         getWindow().setFormat(PixelFormat.UNKNOWN);
@@ -138,8 +135,7 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
         //Log.d(TAG, "updated, ts=" + surface.getTimestamp());
     }*/
 
-    void stopVideo()
-    {
+    void stopVideo() {
         if(videoView != null)
         {
             videoView.stopPlayback();
@@ -172,25 +168,21 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
                 progressDialog.setCancelable(false);
                 // Show progressbar
                 progressDialog.show();
-
                 try {
                     // Start the MediaController
                     MediaController mediaController = new MediaController(
                             FiltersActivity.this);
                     mediaController.setAnchorView(videoView);
-                    Uri video = Uri.parse(Environment.getExternalStorageDirectory()+"/Videos/Despicable-Me-2");
+                    Uri video = Uri.parse(Environment.getExternalStorageDirectory()+"/Videos/Despicable-Me-2.mp4");
                     //Uri video = Uri.parse("http://www.androidbegin.com/tutorial/AndroidCommercial.3gp");
                     //Environment.getExternalStorageDirectory().getAbsolutePath()
                     videoView.setMediaController(mediaController);
                     videoView.setVideoURI(video);
                     //videoView.setVideoPath(Environment.getExternalStorageDirectory()+"/sdcard/Videos/Despicable-Me-2");
-
-
                 } catch (Exception e) {
                     Log.e("Error", e.getMessage());
                     e.printStackTrace();
                 }
-
                 videoView.requestFocus();
                 videoView.setOnPreparedListener(new OnPreparedListener() {
                     // Close the progress bar and play the video
@@ -199,29 +191,17 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
                         videoView.start();
                     }
                 });
-                /*controlInflater = LayoutInflater.from(getBaseContext());
-                View viewControl = controlInflater.inflate(R.layout.control_filters, null);
-                ViewGroup.LayoutParams layoutParamsControl
-                        = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.MATCH_PARENT);
-                this.addContentView(viewControl, layoutParamsControl);*/
-
                 break;
             case R.id.openCameraBtn:
-                //mTextureView.setSurfaceTextureListener(this);
-                //setContentView(mTextureView);
-
-                if(videoView != null)
-                {
+                if(videoView != null){
                     videoView.stopPlayback();
-                    //videoView.setBackgroundResource(0);
                     videoView.setVisibility(View.INVISIBLE);
                 }
-
                 surfaceView.setVisibility(surfaceView.VISIBLE);
                 isClicked = true;
-                if(camera == null)
+                if(camera == null) {
                     camera = Camera.open();
+                }
                 try {
                     camera.setPreviewDisplay(surfaceHolder);
                     camera.startPreview();
@@ -231,33 +211,32 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
-
                 break;
             case R.id.filter_none:
-                //stopVideo();
                 if(isClicked){
-                    if(camera == null)
+                    if(camera == null) {
                         camera = Camera.open();
+                    }
                     params = camera.getParameters();
                     params.setColorEffect(Camera.Parameters.EFFECT_NONE);
                     camera.setParameters(params);
                 }
                 break;
             case R.id.filter_sepia:
-                //stopVideo();
                 if(isClicked) {
-                    if (camera == null)
+                    if (camera == null) {
                         camera = Camera.open();
+                    }
                     params = camera.getParameters();
                     params.setColorEffect(Camera.Parameters.EFFECT_SEPIA);
                     camera.setParameters(params);
                 }
                 break;
             case R.id.filter_aqua:
-               // stopVideo();
                 if(isClicked) {
-                    if (camera == null)
+                    if (camera == null) {
                         camera = Camera.open();
+                    }
                     params = camera.getParameters();
                     params.setColorEffect(Camera.Parameters.EFFECT_AQUA);
                     camera.setParameters(params);
@@ -297,9 +276,6 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
     public void surfaceChanged(SurfaceHolder holder, int format, int width,
                                int height) {
 // TODO Auto-generated method stub
-        /*Camera.Parameters params = camera.getParameters();
-        params.setColorEffect(Camera.Parameters.EFFECT_NEGATIVE);
-        camera.setParameters(params);*/
         if(previewing){
             camera.stopPreview();
             previewing = false;
