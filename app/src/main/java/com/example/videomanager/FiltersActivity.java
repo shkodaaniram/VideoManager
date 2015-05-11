@@ -14,6 +14,9 @@ import android.net.Uri;
 import android.os.Environment;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -45,6 +48,8 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
     ImageButton filter_noneBtn;
     ImageButton filter_sepiaBtn;
     ImageButton filter_aquaBtn;
+    ImageButton filter_negativeBtn;
+
 
     Camera.Parameters params;
 
@@ -55,7 +60,10 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
     SurfaceView surfaceView;
     SurfaceHolder surfaceHolder;
     boolean previewing = false;
-    LayoutInflater controlInflater = null;
+
+    private RecyclerView recycleView;
+    private RecyclerView.Adapter adapter;
+    private RecyclerView.LayoutManager layoutManager;
 
 
     @Override
@@ -64,21 +72,23 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
         setContentView(R.layout.activity_filters);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        downloadVBtn = (Button)findViewById(R.id.downloadVBtn);
+        downloadVBtn = (Button) findViewById(R.id.downloadVBtn);
         downloadVBtn.setOnClickListener(this);
-        openCameraBtn = (Button)findViewById(R.id.openCameraBtn);
+        openCameraBtn = (Button) findViewById(R.id.openCameraBtn);
         openCameraBtn.setOnClickListener(this);
 
-        filter_noneBtn = (ImageButton)findViewById(R.id.filter_none);
+        filter_noneBtn = (ImageButton) findViewById(R.id.filter_none);
         filter_noneBtn.setOnClickListener(this);
-        filter_sepiaBtn = (ImageButton)findViewById(R.id.filter_sepia);
+        filter_sepiaBtn = (ImageButton) findViewById(R.id.filter_sepia);
         filter_sepiaBtn.setOnClickListener(this);
-        filter_aquaBtn = (ImageButton)findViewById(R.id.filter_aqua);
+        filter_aquaBtn = (ImageButton) findViewById(R.id.filter_aqua);
         filter_aquaBtn.setOnClickListener(this);
+        filter_negativeBtn = (ImageButton) findViewById(R.id.filter_negative);
+        filter_negativeBtn.setOnClickListener(this);
 
-        videoView = (VideoView)findViewById(R.id.videoView);
+        videoView = (VideoView) findViewById(R.id.videoView);
 
-        surfaceView = (SurfaceView)findViewById(R.id.cameraPreview);
+        surfaceView = (SurfaceView) findViewById(R.id.cameraPreview);
         getWindow().setFormat(PixelFormat.UNKNOWN);
         surfaceHolder = surfaceView.getHolder();
         surfaceHolder.addCallback(this);
@@ -89,11 +99,19 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
                 = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT);
         this.addContentView(viewControl, layoutParamsControl);*/
-
-
+        /*int[] mImages = {R.drawable.ic_action_video, R.drawable.ic_action_video, R.drawable.ic_action_video,
+                R.drawable.ic_action_video, R.drawable.ic_action_video, R.drawable.ic_action_video,
+                R.drawable.ic_action_video, R.drawable.ic_action_video, R.drawable.ic_action_video};
+        recycleView = (RecyclerView) findViewById(R.id.recycler_view);
+        recycleView.setHasFixedSize(true);
+        layoutManager = new LinearLayoutManager(this);
+        recycleView.setLayoutManager(layoutManager);
+        adapter = new MyAdapter(mImages);
+        recycleView.setAdapter(adapter);*/
     }
 
-   /* @Override
+
+/* @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
 
         if(camera == null)
@@ -136,14 +154,24 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
     }*/
 
     void stopVideo() {
-        if(videoView != null)
-        {
+        if (videoView != null) {
             videoView.stopPlayback();
             //videoView.setBackgroundResource(0);
             videoView.setVisibility(View.INVISIBLE);
         }
 
         surfaceView.setVisibility(surfaceView.VISIBLE);
+    }
+
+    private void setTypeOfFilter(String filter){
+        if (isClicked) {
+            if (camera == null) {
+                camera = Camera.open();
+            }
+            params = camera.getParameters();
+            params.setColorEffect(filter);
+            camera.setParameters(params);
+        }
     }
 
     @Override
@@ -153,7 +181,7 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
                 isClicked = false;
                 surfaceView.setVisibility(surfaceView.INVISIBLE);
                 videoView.setVisibility(View.VISIBLE);
-                if(previewing){
+                if (previewing) {
                     camera.stopPreview();
                     camera.release();
                     camera = null;
@@ -173,7 +201,7 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
                     MediaController mediaController = new MediaController(
                             FiltersActivity.this);
                     mediaController.setAnchorView(videoView);
-                    Uri video = Uri.parse(Environment.getExternalStorageDirectory()+"/Videos/Despicable-Me-2.mp4");
+                    Uri video = Uri.parse(Environment.getExternalStorageDirectory() + "/Videos/Despicable-Me-2.mp4");
                     //Uri video = Uri.parse("http://www.androidbegin.com/tutorial/AndroidCommercial.3gp");
                     //Environment.getExternalStorageDirectory().getAbsolutePath()
                     videoView.setMediaController(mediaController);
@@ -193,13 +221,13 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
                 });
                 break;
             case R.id.openCameraBtn:
-                if(videoView != null){
+                if (videoView != null) {
                     videoView.stopPlayback();
                     videoView.setVisibility(View.INVISIBLE);
                 }
                 surfaceView.setVisibility(surfaceView.VISIBLE);
                 isClicked = true;
-                if(camera == null) {
+                if (camera == null) {
                     camera = Camera.open();
                 }
                 try {
@@ -213,34 +241,16 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
                 }
                 break;
             case R.id.filter_none:
-                if(isClicked){
-                    if(camera == null) {
-                        camera = Camera.open();
-                    }
-                    params = camera.getParameters();
-                    params.setColorEffect(Camera.Parameters.EFFECT_NONE);
-                    camera.setParameters(params);
-                }
+                setTypeOfFilter(Camera.Parameters.EFFECT_NONE);
                 break;
             case R.id.filter_sepia:
-                if(isClicked) {
-                    if (camera == null) {
-                        camera = Camera.open();
-                    }
-                    params = camera.getParameters();
-                    params.setColorEffect(Camera.Parameters.EFFECT_SEPIA);
-                    camera.setParameters(params);
-                }
+                setTypeOfFilter(Camera.Parameters.EFFECT_SEPIA);
                 break;
             case R.id.filter_aqua:
-                if(isClicked) {
-                    if (camera == null) {
-                        camera = Camera.open();
-                    }
-                    params = camera.getParameters();
-                    params.setColorEffect(Camera.Parameters.EFFECT_AQUA);
-                    camera.setParameters(params);
-                }
+                setTypeOfFilter(Camera.Parameters.EFFECT_AQUA);
+                break;
+            case R.id.filter_negative:
+                setTypeOfFilter(Camera.Parameters.EFFECT_NEGATIVE);
                 break;
             default:
                 break;
@@ -256,10 +266,18 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
                 .getRotation();
         int degrees = 0;
         switch (rotation) {
-            case Surface.ROTATION_0: degrees = 0; break;
-            case Surface.ROTATION_90: degrees = 90; break;
-            case Surface.ROTATION_180: degrees = 180; break;
-            case Surface.ROTATION_270: degrees = 270; break;
+            case Surface.ROTATION_0:
+                degrees = 0;
+                break;
+            case Surface.ROTATION_90:
+                degrees = 90;
+                break;
+            case Surface.ROTATION_180:
+                degrees = 180;
+                break;
+            case Surface.ROTATION_270:
+                degrees = 270;
+                break;
         }
 
         int result;
@@ -276,29 +294,19 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
     public void surfaceChanged(SurfaceHolder holder, int format, int width,
                                int height) {
 // TODO Auto-generated method stub
-        if(previewing){
+        setCameraDisplayOrientation(this, 0, camera);
+       /* if (previewing) {
             camera.stopPreview();
             previewing = false;
         }
         setCameraDisplayOrientation(this, 0, camera);
-        /*if (camera != null){
-            try {
-
-                        camera.setPreviewDisplay(surfaceHolder);
-                        camera.startPreview();
-                        previewing = true;
-
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }*/
+        */
     }
 
     @Override
     public void surfaceCreated(SurfaceHolder holder) {
 // TODO Auto-generated method stub
-            camera = Camera.open();
+        camera = Camera.open();
     }
 
     @Override

@@ -8,5 +8,6 @@
     <string name="hello_world">Hello world!</string>
     <string name="downloadVideo">Download</string>
     <string name="openCamera">Camera</string>
+    <string name="menuCamera"> </string>
     <string name="title_activity_menu">MenuActivity</string>
 </resources>

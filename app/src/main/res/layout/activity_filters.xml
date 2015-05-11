@@ -28,38 +28,46 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/filter_none"
+                android:background="@drawable/ic_action_video"
                 android:minWidth="70dp"
                 android:minHeight="50dp"/>
             <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="70dp"
+                android:layout_height="50dp"
                 android:id="@+id/filter_sepia"
+                android:background="@drawable/background"
                 android:minWidth="70dp"
                 android:minHeight="50dp"/>
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/filter_aqua"
+                android:background="@drawable/ic_action_video"
                 android:minWidth="70dp"
                 android:minHeight="50dp"/>
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:id="@+id/filter_negative"
+                android:background="@drawable/ic_action_video"
                 android:minWidth="70dp"
                 android:minHeight="50dp"/>
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:background="@drawable/ic_action_video"
                 android:minWidth="70dp"
                 android:minHeight="50dp"/>
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:background="@drawable/ic_action_video"
                 android:minWidth="70dp"
                 android:minHeight="50dp"/>
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:background="@drawable/ic_action_video"
                 android:minWidth="70dp"
                 android:minHeight="50dp" />
         </LinearLayout>
@@ -123,5 +131,12 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"/>
+
+
+   <!-- <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:scrollbars="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>-->
 
 </RelativeLayout>
