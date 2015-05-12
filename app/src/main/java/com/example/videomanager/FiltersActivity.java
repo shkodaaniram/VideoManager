@@ -49,7 +49,11 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
     ImageButton filter_sepiaBtn;
     ImageButton filter_aquaBtn;
     ImageButton filter_negativeBtn;
-
+    ImageButton filter_blackboardBtn;
+    ImageButton filter_monoBtn;
+    ImageButton filter_posterizeBtn;
+    ImageButton filter_solarizeBtn;
+    ImageButton filter_whiteboardBtn;
 
     Camera.Parameters params;
 
@@ -85,6 +89,16 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
         filter_aquaBtn.setOnClickListener(this);
         filter_negativeBtn = (ImageButton) findViewById(R.id.filter_negative);
         filter_negativeBtn.setOnClickListener(this);
+        filter_blackboardBtn = (ImageButton) findViewById(R.id.filter_blackboard);
+        filter_blackboardBtn.setOnClickListener(this);
+        filter_monoBtn = (ImageButton) findViewById(R.id.filter_mono);
+        filter_monoBtn.setOnClickListener(this);
+        filter_posterizeBtn = (ImageButton) findViewById(R.id.filter_posterize);
+        filter_posterizeBtn.setOnClickListener(this);
+        filter_solarizeBtn = (ImageButton) findViewById(R.id.filter_solarize);
+        filter_solarizeBtn.setOnClickListener(this);
+        filter_whiteboardBtn = (ImageButton) findViewById(R.id.filter_whiteboard);
+        filter_whiteboardBtn.setOnClickListener(this);
 
         videoView = (VideoView) findViewById(R.id.videoView);
 
@@ -251,6 +265,21 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
                 break;
             case R.id.filter_negative:
                 setTypeOfFilter(Camera.Parameters.EFFECT_NEGATIVE);
+                break;
+            case R.id.filter_posterize:
+                setTypeOfFilter(Camera.Parameters.EFFECT_POSTERIZE);
+                break;
+            case R.id.filter_solarize:
+                setTypeOfFilter(Camera.Parameters.EFFECT_SOLARIZE);
+                break;
+            case R.id.filter_mono:
+                setTypeOfFilter(Camera.Parameters.EFFECT_MONO);
+                break;
+            case R.id.filter_whiteboard:
+                setTypeOfFilter(Camera.Parameters.EFFECT_WHITEBOARD);
+                break;
+            case R.id.filter_blackboard:
+                setTypeOfFilter(Camera.Parameters.EFFECT_BLACKBOARD);
                 break;
             default:
                 break;

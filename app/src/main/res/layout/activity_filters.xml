@@ -25,48 +25,51 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true">
             <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="70dp"
+                android:layout_height="50dp"
                 android:id="@+id/filter_none"
-                android:background="@drawable/ic_action_video"
-                android:minWidth="70dp"
-                android:minHeight="50dp"/>
+                android:background="@drawable/sunflower_none"/>
             <ImageButton
                 android:layout_width="70dp"
                 android:layout_height="50dp"
                 android:id="@+id/filter_sepia"
-                android:background="@drawable/background"
-                android:minWidth="70dp"
-                android:minHeight="50dp"/>
+                android:background="@drawable/sunflower_sepia"/>
             <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="70dp"
+                android:layout_height="50dp"
                 android:id="@+id/filter_aqua"
-                android:background="@drawable/ic_action_video"
-                android:minWidth="70dp"
-                android:minHeight="50dp"/>
+                android:background="@drawable/sunflower_aqua"/>
             <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="70dp"
+                android:layout_height="50dp"
                 android:id="@+id/filter_negative"
-                android:background="@drawable/ic_action_video"
-                android:minWidth="70dp"
-                android:minHeight="50dp"/>
+                android:background="@drawable/sunflower_negative"/>
+            <ImageButton
+                android:layout_width="70dp"
+                android:layout_height="50dp"
+                android:id="@+id/filter_posterize"
+                android:background="@drawable/sunflower_posterize"/>
+            <ImageButton
+                android:layout_width="70dp"
+                android:layout_height="50dp"
+                android:id="@+id/filter_solarize"
+                android:background="@drawable/sunflower_solarize"/>
+            <ImageButton
+                android:layout_width="70dp"
+                android:layout_height="50dp"
+                android:id="@+id/filter_mono"
+                android:background="@drawable/sunflower_mono"/>
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:id="@+id/filter_whiteboard"
                 android:background="@drawable/ic_action_video"
                 android:minWidth="70dp"
-                android:minHeight="50dp"/>
+                android:minHeight="50dp" />
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/ic_action_video"
-                android:minWidth="70dp"
-                android:minHeight="50dp"/>
-            <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:id="@+id/filter_blackboard"
                 android:background="@drawable/ic_action_video"
                 android:minWidth="70dp"
                 android:minHeight="50dp" />
