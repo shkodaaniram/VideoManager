@@ -3,13 +3,51 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.example.videomanager.FiltersActivity">
 
-    <item android:id="@+id/action_settings" android:title="@string/action_settings"
-        android:orderInCategory="100" app:showAsAction="never" />
     <item
-        android:id="@+id/openCamera"
+        android:id="@+id/downloadVItm"
+        android:orderInCategory="100"
+        android:title="@string/menuCamera"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/ic_action_download">
+        <menu>
+            <group>
+
+                <item
+                    android:id="@+id/fromSDcardItm"
+                    android:orderInCategory="100"
+                    android:title="@string/fromSDcard"
+                    app:showAsAction="never"
+                    android:icon="@drawable/ic_action_sd_storage"/>
+
+                <item
+                    android:id="@+id/fromAccountItm"
+                    android:orderInCategory="200"
+                    app:showAsAction="never"
+                    android:title="@string/fromAccount"
+                    android:icon="@drawable/ic_action_person"/>
+
+            </group>
+        </menu>
+    </item>
+    <item
+        android:id="@+id/openCameraItm"
         android:orderInCategory="200"
         android:title="@string/menuCamera"
-        app:showAsAction="always"
+        app:showAsAction="ifRoom"
         android:icon="@drawable/ic_action_video"/>
+    <item
+        android:id="@+id/shareItm"
+        android:orderInCategory="200"
+        android:icon="@drawable/ic_action_share"
+        android:drawable="@drawable/ic_action_share"
+        android:title="@string/share"
+        app:showAsAction="never" />
+
+    <item android:id="@+id/aboutItm"
+        android:title="@string/action_about"
+        android:orderInCategory="300"
+        android:icon="@drawable/ic_action_about"
+        app:showAsAction="never"/>
+
 </menu>
 

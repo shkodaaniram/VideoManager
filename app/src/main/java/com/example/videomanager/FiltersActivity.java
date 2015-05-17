@@ -10,6 +10,8 @@ import android.graphics.PixelFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.media.MediaPlayer;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Environment;
 import android.support.v7.app.ActionBarActivity;
@@ -76,10 +78,10 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
         setContentView(R.layout.activity_filters);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        downloadVBtn = (Button) findViewById(R.id.downloadVBtn);
+       /* downloadVBtn = (Button) findViewById(R.id.downloadVBtn);
         downloadVBtn.setOnClickListener(this);
         openCameraBtn = (Button) findViewById(R.id.openCameraBtn);
-        openCameraBtn.setOnClickListener(this);
+        openCameraBtn.setOnClickListener(this);*/
 
         filter_noneBtn = (ImageButton) findViewById(R.id.filter_none);
         filter_noneBtn.setOnClickListener(this);
@@ -107,12 +109,6 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
         surfaceHolder = surfaceView.getHolder();
         surfaceHolder.addCallback(this);
         surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-        /*controlInflater = LayoutInflater.from(getBaseContext());
-        View viewControl = controlInflater.inflate(R.layout.control_filters, null);
-        ViewGroup.LayoutParams layoutParamsControl
-                = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT);
-        this.addContentView(viewControl, layoutParamsControl);*/
         /*int[] mImages = {R.drawable.ic_action_video, R.drawable.ic_action_video, R.drawable.ic_action_video,
                 R.drawable.ic_action_video, R.drawable.ic_action_video, R.drawable.ic_action_video,
                 R.drawable.ic_action_video, R.drawable.ic_action_video, R.drawable.ic_action_video};
@@ -122,59 +118,6 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
         recycleView.setLayoutManager(layoutManager);
         adapter = new MyAdapter(mImages);
         recycleView.setAdapter(adapter);*/
-    }
-
-
-/* @Override
-    public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-
-        if(camera == null)
-            camera = Camera.open();
-        params = camera.getParameters();
-        params.setPreviewSize(videoView.getWidth(), videoView.getHeight());
-        camera.setParameters(params);
-        camera.startPreview();
-        if (camera == null) {
-            // Seeing this on Nexus 7 2012 -- I guess it wants a rear-facing camera, but
-            // there isn't one.  TODO: fix
-            throw new RuntimeException("Default camera not available");
-        }
-
-        try {
-            camera.setPreviewTexture(surface);
-            camera.startPreview();
-        } catch (IOException ioe) {
-            // Something bad happened
-        }
-
-    }
-
-    @Override
-    public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
-        // Ignored, Camera does all the work for us
-    }
-
-    @Override
-    public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-        camera.stopPreview();
-        camera.release();
-        return true;
-    }
-
-    @Override
-    public void onSurfaceTextureUpdated(SurfaceTexture surface) {
-        // Invoked every time there's a new Camera preview frame
-        //Log.d(TAG, "updated, ts=" + surface.getTimestamp());
-    }*/
-
-    void stopVideo() {
-        if (videoView != null) {
-            videoView.stopPlayback();
-            //videoView.setBackgroundResource(0);
-            videoView.setVisibility(View.INVISIBLE);
-        }
-
-        surfaceView.setVisibility(surfaceView.VISIBLE);
     }
 
     private void setTypeOfFilter(String filter){
@@ -191,7 +134,7 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.downloadVBtn:
+            /*case R.id.downloadVBtn:
                 isClicked = false;
                 surfaceView.setVisibility(surfaceView.INVISIBLE);
                 videoView.setVisibility(View.VISIBLE);
@@ -253,7 +196,7 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
-                break;
+                break;*/
             case R.id.filter_none:
                 setTypeOfFilter(Camera.Parameters.EFFECT_NONE);
                 break;
@@ -347,24 +290,87 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
         previewing = false;
     }
 
+    public boolean isNetworkAvaliable(){
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        boolean isNetworkAvailable = activeNetworkInfo != null && activeNetworkInfo.isConnectedOrConnecting();
+        return isNetworkAvailable;
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_filters, menu);
+        boolean isNetworkAvailable = isNetworkAvaliable();
+        MenuItem shareMenuItem = menu.findItem(R.id.shareItm);
+        MenuItem fromAccountItem = menu.findItem(R.id.fromAccountItm);
+        shareMenuItem.setVisible(isNetworkAvailable);
+        fromAccountItem.setVisible(isNetworkAvailable);
+        FiltersActivity.this.invalidateOptionsMenu();
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+        switch(item.getItemId()){
+            case R.id.fromSDcardItm:
+                isClicked = false;
+                surfaceView.setVisibility(surfaceView.INVISIBLE);
+                videoView.setVisibility(View.VISIBLE);
+                if (previewing) {
+                    camera.stopPreview();
+                    camera.release();
+                    camera = null;
+                    previewing = false;
+                }
+                progressDialog = new ProgressDialog(FiltersActivity.this);
+                progressDialog.setTitle("Downloading video...");
+                progressDialog.setMessage("Buffering...");
+                progressDialog.setIndeterminate(false);
+                progressDialog.setCancelable(false);
+                progressDialog.show();
+                try {
+                    MediaController mediaController = new MediaController(
+                            FiltersActivity.this);
+                    mediaController.setAnchorView(videoView);
+                    Uri video = Uri.parse(Environment.getExternalStorageDirectory() + "/Videos/Despicable-Me-2.mp4");
+                    //Uri video = Uri.parse("http://www.androidbegin.com/tutorial/AndroidCommercial.3gp");
+                    //Environment.getExternalStorageDirectory().getAbsolutePath()
+                    videoView.setMediaController(mediaController);
+                    videoView.setVideoURI(video);
+                } catch (Exception e) {
+                    Log.e("Error", e.getMessage());
+                    e.printStackTrace();
+                }
+                videoView.requestFocus();
+                videoView.setOnPreparedListener(new OnPreparedListener() {
+                    // Close the progress bar and play the video
+                    public void onPrepared(MediaPlayer mp) {
+                        progressDialog.dismiss();
+                        videoView.start();
+                    }
+                });
+                return true;
+            case R.id.openCameraItm:
+                if (videoView != null) {
+                    videoView.stopPlayback();
+                    videoView.setVisibility(View.INVISIBLE);
+                }
+                surfaceView.setVisibility(surfaceView.VISIBLE);
+                isClicked = true;
+                if (camera == null) {
+                    camera = Camera.open();
+                }
+                try {
+                    camera.setPreviewDisplay(surfaceHolder);
+                    camera.startPreview();
+                    previewing = true;
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
