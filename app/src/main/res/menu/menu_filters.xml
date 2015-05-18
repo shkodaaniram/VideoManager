@@ -39,7 +39,6 @@
         android:id="@+id/shareItm"
         android:orderInCategory="200"
         android:icon="@drawable/ic_action_share"
-        android:drawable="@drawable/ic_action_share"
         android:title="@string/share"
         app:showAsAction="never" />
 
@@ -48,6 +47,7 @@
         android:orderInCategory="300"
         android:icon="@drawable/ic_action_about"
         app:showAsAction="never"/>
+
 
 </menu>
 

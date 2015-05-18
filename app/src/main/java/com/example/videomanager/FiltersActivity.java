@@ -2,9 +2,11 @@ package com.example.videomanager;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.graphics.PixelFormat;
 import android.graphics.SurfaceTexture;
@@ -13,6 +15,7 @@ import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.os.Environment;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -42,6 +45,8 @@ import java.io.IOException;
 
 
 public class FiltersActivity extends ActionBarActivity implements OnClickListener, SurfaceHolder.Callback {
+
+    private int PICK_REQUEST = 1;
 
     ProgressDialog progressDialog;
     VideoView videoView;
@@ -77,6 +82,7 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_filters);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
 
        /* downloadVBtn = (Button) findViewById(R.id.downloadVBtn);
         downloadVBtn.setOnClickListener(this);
@@ -298,16 +304,79 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
     }
 
 
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_filters, menu);
+
         boolean isNetworkAvailable = isNetworkAvaliable();
         MenuItem shareMenuItem = menu.findItem(R.id.shareItm);
         MenuItem fromAccountItem = menu.findItem(R.id.fromAccountItm);
         shareMenuItem.setVisible(isNetworkAvailable);
         fromAccountItem.setVisible(isNetworkAvailable);
-        FiltersActivity.this.invalidateOptionsMenu();
+        //FiltersActivity.this.invalidateOptionsMenu();
+
         return true;
+    }
+
+    @Override
+    public void invalidateOptionsMenu() {
+        super.invalidateOptionsMenu();
+        BroadcastReceiver broadcastReceiver = new BroadcastReceiver(){
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                final String action = intent.getAction();
+                final MenuItem shareMenuItem = (MenuItem)findViewById(R.id.shareItm);
+                final MenuItem fromAccountItem = (MenuItem)findViewById(R.id.fromAccountItm);
+                if(action.equals(WifiManager.NETWORK_STATE_CHANGED_ACTION)){
+                    NetworkInfo info = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
+                    boolean connected = info.isConnected();
+
+                    shareMenuItem.setVisible(connected);
+                    fromAccountItem.setVisible(connected);
+                }
+            }
+        };
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION);
+        registerReceiver(broadcastReceiver, intentFilter);
+    }
+
+    private void playingVideo(Uri uri){
+        progressDialog = new ProgressDialog(FiltersActivity.this);
+        progressDialog.setTitle("Downloading video...");
+        progressDialog.setMessage("Buffering...");
+        progressDialog.setIndeterminate(false);
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+        try {
+            MediaController mediaController = new MediaController(
+                    FiltersActivity.this);
+            mediaController.setAnchorView(videoView);
+            videoView.setMediaController(mediaController);
+            videoView.setVideoURI(uri);
+        } catch (Exception e) {
+            Log.e("Error", e.getMessage());
+            e.printStackTrace();
+        }
+        videoView.requestFocus();
+        videoView.setOnPreparedListener(new OnPreparedListener() {
+            // Close the progress bar and play the video
+            public void onPrepared(MediaPlayer mp) {
+                progressDialog.dismiss();
+                videoView.start();
+            }
+        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == PICK_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
+            Uri uri = data.getData();
+            playingVideo(uri);
+        }
     }
 
     @Override
@@ -323,33 +392,14 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
                     camera = null;
                     previewing = false;
                 }
-                progressDialog = new ProgressDialog(FiltersActivity.this);
-                progressDialog.setTitle("Downloading video...");
-                progressDialog.setMessage("Buffering...");
-                progressDialog.setIndeterminate(false);
-                progressDialog.setCancelable(false);
-                progressDialog.show();
-                try {
-                    MediaController mediaController = new MediaController(
-                            FiltersActivity.this);
-                    mediaController.setAnchorView(videoView);
-                    Uri video = Uri.parse(Environment.getExternalStorageDirectory() + "/Videos/Despicable-Me-2.mp4");
-                    //Uri video = Uri.parse("http://www.androidbegin.com/tutorial/AndroidCommercial.3gp");
-                    //Environment.getExternalStorageDirectory().getAbsolutePath()
-                    videoView.setMediaController(mediaController);
-                    videoView.setVideoURI(video);
-                } catch (Exception e) {
-                    Log.e("Error", e.getMessage());
-                    e.printStackTrace();
-                }
-                videoView.requestFocus();
-                videoView.setOnPreparedListener(new OnPreparedListener() {
-                    // Close the progress bar and play the video
-                    public void onPrepared(MediaPlayer mp) {
-                        progressDialog.dismiss();
-                        videoView.start();
-                    }
-                });
+                Intent mediaChooser = new Intent(Intent.ACTION_GET_CONTENT);
+                mediaChooser.setType("video/*");
+                videoView.stopPlayback();
+                startActivityForResult(mediaChooser, PICK_REQUEST);
+                return true;
+            case R.id.fromAccountItm:
+                Uri uri = Uri.parse("http://www.androidbegin.com/tutorial/AndroidCommercial.3gp");
+                playingVideo(uri);
                 return true;
             case R.id.openCameraItm:
                 if (videoView != null) {
