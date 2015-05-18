@@ -3,11 +3,14 @@ package com.example.videomanager;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.PixelFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
@@ -17,15 +20,19 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.os.Environment;
+import android.provider.MediaStore;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.format.Time;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -37,11 +44,20 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.MediaController;
+import android.widget.Toast;
 import android.widget.VideoView;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup.LayoutParams;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
 public class FiltersActivity extends ActionBarActivity implements OnClickListener, SurfaceHolder.Callback {
@@ -52,6 +68,7 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
     VideoView videoView;
     Button downloadVBtn;
     Button openCameraBtn;
+    Button takePictureBtn;
     ImageButton filter_noneBtn;
     ImageButton filter_sepiaBtn;
     ImageButton filter_aquaBtn;
@@ -71,6 +88,9 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
     SurfaceView surfaceView;
     SurfaceHolder surfaceHolder;
     boolean previewing = false;
+    LayoutInflater controlInflater = null;
+
+    View viewControl;
 
     private RecyclerView recycleView;
     private RecyclerView.Adapter adapter;
@@ -82,7 +102,6 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_filters);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
 
        /* downloadVBtn = (Button) findViewById(R.id.downloadVBtn);
         downloadVBtn.setOnClickListener(this);
@@ -115,6 +134,14 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
         surfaceHolder = surfaceView.getHolder();
         surfaceHolder.addCallback(this);
         surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+
+        controlInflater = LayoutInflater.from(getBaseContext());
+        viewControl = controlInflater.inflate(R.layout.control_camera, null);
+        viewControl.setVisibility(View.INVISIBLE);
+        LayoutParams layoutParamsControl
+                = new LayoutParams(LayoutParams.FILL_PARENT,
+                LayoutParams.FILL_PARENT);
+        this.addContentView(viewControl, layoutParamsControl);
         /*int[] mImages = {R.drawable.ic_action_video, R.drawable.ic_action_video, R.drawable.ic_action_video,
                 R.drawable.ic_action_video, R.drawable.ic_action_video, R.drawable.ic_action_video,
                 R.drawable.ic_action_video, R.drawable.ic_action_video, R.drawable.ic_action_video};
@@ -124,6 +151,9 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
         recycleView.setLayoutManager(layoutManager);
         adapter = new MyAdapter(mImages);
         recycleView.setAdapter(adapter);*/
+
+        takePictureBtn = (Button)findViewById(R.id.takepicture);
+        takePictureBtn.setOnClickListener(this);
     }
 
     private void setTypeOfFilter(String filter){
@@ -140,69 +170,9 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            /*case R.id.downloadVBtn:
-                isClicked = false;
-                surfaceView.setVisibility(surfaceView.INVISIBLE);
-                videoView.setVisibility(View.VISIBLE);
-                if (previewing) {
-                    camera.stopPreview();
-                    camera.release();
-                    camera = null;
-                    previewing = false;
-                }
-                progressDialog = new ProgressDialog(FiltersActivity.this);
-                // Set progressbar title
-                progressDialog.setTitle("Downloading video...");
-                // Set progressbar message
-                progressDialog.setMessage("Buffering...");
-                progressDialog.setIndeterminate(false);
-                progressDialog.setCancelable(false);
-                // Show progressbar
-                progressDialog.show();
-                try {
-                    // Start the MediaController
-                    MediaController mediaController = new MediaController(
-                            FiltersActivity.this);
-                    mediaController.setAnchorView(videoView);
-                    Uri video = Uri.parse(Environment.getExternalStorageDirectory() + "/Videos/Despicable-Me-2.mp4");
-                    //Uri video = Uri.parse("http://www.androidbegin.com/tutorial/AndroidCommercial.3gp");
-                    //Environment.getExternalStorageDirectory().getAbsolutePath()
-                    videoView.setMediaController(mediaController);
-                    videoView.setVideoURI(video);
-                    //videoView.setVideoPath(Environment.getExternalStorageDirectory()+"/sdcard/Videos/Despicable-Me-2");
-                } catch (Exception e) {
-                    Log.e("Error", e.getMessage());
-                    e.printStackTrace();
-                }
-                videoView.requestFocus();
-                videoView.setOnPreparedListener(new OnPreparedListener() {
-                    // Close the progress bar and play the video
-                    public void onPrepared(MediaPlayer mp) {
-                        progressDialog.dismiss();
-                        videoView.start();
-                    }
-                });
+            case R.id.takepicture:
+                camera.takePicture(null, null, myPictureCallback_JPG);
                 break;
-            case R.id.openCameraBtn:
-                if (videoView != null) {
-                    videoView.stopPlayback();
-                    videoView.setVisibility(View.INVISIBLE);
-                }
-                surfaceView.setVisibility(surfaceView.VISIBLE);
-                isClicked = true;
-                if (camera == null) {
-                    camera = Camera.open();
-                }
-                try {
-                    camera.setPreviewDisplay(surfaceHolder);
-                    camera.startPreview();
-                    previewing = true;
-
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-                break;*/
             case R.id.filter_none:
                 setTypeOfFilter(Camera.Parameters.EFFECT_NONE);
                 break;
@@ -234,6 +204,83 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
                 break;
         }
     }
+
+    /*Camera.ShutterCallback myShutterCallback = new Camera.ShutterCallback(){
+
+        @Override
+        public void onShutter() {
+            // TODO Auto-generated method stub
+
+        }};
+
+    Camera.PictureCallback myPictureCallback_RAW = new Camera.PictureCallback(){
+
+        @Override
+        public void onPictureTaken(byte[] arg0, Camera arg1) {
+            // TODO Auto-generated method stub
+
+        }};*/
+
+    Camera.PictureCallback myPictureCallback_JPG = new Camera.PictureCallback(){
+
+        @Override
+        public void onPictureTaken(byte[] arg0, Camera arg1) {
+            /*Bitmap bitmapPicture
+                    = BitmapFactory.decodeByteArray(arg0, 0, arg0.length);*/
+            // Uri uriTarget = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, new ContentValues());
+            /*String fileName = Environment.getExternalStorageDirectory().toString()+"image.jpg";
+            File f = new File(fileName);
+            Uri uriTarget = Uri.fromFile(f);
+            OutputStream imageFileOS;
+            Time time = new Time();
+            time.setToNow();
+            try {
+                imageFileOS = getContentResolver().openOutputStream(uriTarget);
+                imageFileOS.write(arg0);
+                imageFileOS.flush();
+                imageFileOS.close();
+                Toast.makeText(FiltersActivity.this, "Image saved: " + uriTarget.toString(), Toast.LENGTH_LONG).show();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }*/
+            File pictureFile = getOutputMediaFile();
+            if (pictureFile == null) {
+                return;
+            }
+            try {
+                FileOutputStream fos = new FileOutputStream(pictureFile);
+                fos.write(arg0);
+                fos.close();
+            } catch (FileNotFoundException e) {
+
+            } catch (IOException e) {
+            }
+            camera.startPreview();
+        }
+        };
+
+
+    private  File getOutputMediaFile() {
+        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
+                                    "Video Manager/Images");
+        if (!mediaStorageDir.exists()) {
+            if (!mediaStorageDir.mkdirs()) {
+                Log.d("Images", "failed to create directory");
+                return null;
+            }
+        }
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss")
+                .format(new Date());
+        File mediaFile;
+        mediaFile = new File(mediaStorageDir.getPath() + File.separator
+                + "IMG_" + timeStamp + ".jpg");
+        Toast.makeText(FiltersActivity.this, "Image saved: " + mediaFile.toString(), Toast.LENGTH_LONG).show();
+        return mediaFile;
+    }
+
 
     public static void setCameraDisplayOrientation(Activity activity, int cameraId, android.hardware.Camera camera) {
         android.hardware.Camera.CameraInfo info =
@@ -285,6 +332,7 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
     public void surfaceCreated(SurfaceHolder holder) {
 // TODO Auto-generated method stub
         camera = Camera.open();
+
     }
 
     @Override
@@ -309,6 +357,11 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_filters, menu);
 
+        /*ActionBar actionBar = getSupportActionBar();
+        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+        actionBar.setDisplayShowHomeEnabled(false);
+        actionBar.setDisplayShowTitleEnabled(false);*/
+
         boolean isNetworkAvailable = isNetworkAvaliable();
         MenuItem shareMenuItem = menu.findItem(R.id.shareItm);
         MenuItem fromAccountItem = menu.findItem(R.id.fromAccountItm);
@@ -318,6 +371,7 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
 
         return true;
     }
+
 
     @Override
     public void invalidateOptionsMenu() {
@@ -379,25 +433,31 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
         }
     }
 
+    private void stopCameraPreview(){
+        isClicked = false;
+        viewControl.setVisibility(View.INVISIBLE);
+        surfaceView.setVisibility(surfaceView.INVISIBLE);
+        videoView.setVisibility(View.VISIBLE);
+        if (previewing) {
+            camera.stopPreview();
+            camera.release();
+            camera = null;
+            previewing = false;
+        }
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()){
             case R.id.fromSDcardItm:
-                isClicked = false;
-                surfaceView.setVisibility(surfaceView.INVISIBLE);
-                videoView.setVisibility(View.VISIBLE);
-                if (previewing) {
-                    camera.stopPreview();
-                    camera.release();
-                    camera = null;
-                    previewing = false;
-                }
+                stopCameraPreview();
                 Intent mediaChooser = new Intent(Intent.ACTION_GET_CONTENT);
                 mediaChooser.setType("video/*");
                 videoView.stopPlayback();
                 startActivityForResult(mediaChooser, PICK_REQUEST);
                 return true;
             case R.id.fromAccountItm:
+                stopCameraPreview();
                 Uri uri = Uri.parse("http://www.androidbegin.com/tutorial/AndroidCommercial.3gp");
                 playingVideo(uri);
                 return true;
@@ -407,6 +467,7 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
                     videoView.setVisibility(View.INVISIBLE);
                 }
                 surfaceView.setVisibility(surfaceView.VISIBLE);
+                viewControl.setVisibility(View.VISIBLE);
                 isClicked = true;
                 if (camera == null) {
                     camera = Camera.open();

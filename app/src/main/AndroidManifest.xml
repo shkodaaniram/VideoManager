@@ -39,13 +39,10 @@
             android:name=".FiltersActivity"
             android:label="@string/title_activity_filters"
             android:configChanges="orientation|screenSize"
-            android:uiOptions="splitActionBarWhenNarrow"
             android:parentActivityName=".MenuActivity" >
             <meta-data
-                android:name="android.support.UI_OPTIONS"
-                android:value="splitActionBarWhenNarrow" />
-                <!--android:name="android.support.PARENT_ACTIVITY"
-                android:value=".StartActivity"--> />
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".StartActivity" />
         </activity>
         <activity
             android:name=".MenuActivity"
