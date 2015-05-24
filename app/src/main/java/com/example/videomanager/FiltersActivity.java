@@ -14,7 +14,9 @@ import android.graphics.BitmapFactory;
 import android.graphics.PixelFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
+import android.media.CamcorderProfile;
 import android.media.MediaPlayer;
+import android.media.MediaRecorder;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -66,9 +68,8 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
 
     ProgressDialog progressDialog;
     VideoView videoView;
-    Button downloadVBtn;
-    Button openCameraBtn;
     Button takePictureBtn;
+    Button recordBtn;
     ImageButton filter_noneBtn;
     ImageButton filter_sepiaBtn;
     ImageButton filter_aquaBtn;
@@ -89,6 +90,9 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
     SurfaceHolder surfaceHolder;
     boolean previewing = false;
     LayoutInflater controlInflater = null;
+    private MediaRecorder mMediaRecorder;
+    private boolean mInitSuccessful = false;
+
 
     View viewControl;
 
@@ -102,11 +106,6 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_filters);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-       /* downloadVBtn = (Button) findViewById(R.id.downloadVBtn);
-        downloadVBtn.setOnClickListener(this);
-        openCameraBtn = (Button) findViewById(R.id.openCameraBtn);
-        openCameraBtn.setOnClickListener(this);*/
 
         filter_noneBtn = (ImageButton) findViewById(R.id.filter_none);
         filter_noneBtn.setOnClickListener(this);
@@ -152,8 +151,10 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
         adapter = new MyAdapter(mImages);
         recycleView.setAdapter(adapter);*/
 
-        takePictureBtn = (Button)findViewById(R.id.takepicture);
+        takePictureBtn = (Button)findViewById(R.id.takePictureBtn);
         takePictureBtn.setOnClickListener(this);
+        recordBtn = (Button)findViewById(R.id.recordBtn);
+        recordBtn.setOnClickListener(this);
     }
 
     private void setTypeOfFilter(String filter){
@@ -170,8 +171,22 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.takepicture:
+            case R.id.takePictureBtn:
                 camera.takePicture(null, null, myPictureCallback_JPG);
+                viewControl.setVisibility(View.INVISIBLE);
+                break;
+            case R.id.recordBtn:
+                mMediaRecorder.start();
+                finish();
+                break;
+            case R.id.stopRecordBtn:
+                mMediaRecorder.stop();
+                mMediaRecorder.reset();
+                try {
+                    initRecorder(surfaceHolder.getSurface());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 break;
             case R.id.filter_none:
                 setTypeOfFilter(Camera.Parameters.EFFECT_NONE);
@@ -205,47 +220,42 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
         }
     }
 
-    /*Camera.ShutterCallback myShutterCallback = new Camera.ShutterCallback(){
+    private void initRecorder(Surface surface) throws IOException {
 
-        @Override
-        public void onShutter() {
-            // TODO Auto-generated method stub
+        if(camera == null) {
+            camera = Camera.open();
+        }
+        if(mMediaRecorder == null) {
+            mMediaRecorder = new MediaRecorder();
+        }
+        mMediaRecorder.setPreviewDisplay(surface);
+        mMediaRecorder.setCamera(camera);
 
-        }};
+        mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.DEFAULT);
+        mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+        mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
+        mMediaRecorder.setVideoEncodingBitRate(512 * 1000);
+        mMediaRecorder.setVideoFrameRate(30);
+        mMediaRecorder.setVideoSize(640, 480);
+        //File mediaFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) +
+                //"Video Manager/Videos/attempt001.mp4");
+        File mediaFile = new File(Environment.getExternalStorageDirectory() + File.separator
+                + Environment.DIRECTORY_PICTURES + File.separator + "test" + ".mp4");
+        mMediaRecorder.setOutputFile(mediaFile.toString());
+       // Toast.makeText(FiltersActivity.this, "Video saved: " + mediaFile.toString(), Toast.LENGTH_LONG).show();
+        try {
+            mMediaRecorder.prepare();
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        }
+        mInitSuccessful = true;
+    }
 
-    Camera.PictureCallback myPictureCallback_RAW = new Camera.PictureCallback(){
-
-        @Override
-        public void onPictureTaken(byte[] arg0, Camera arg1) {
-            // TODO Auto-generated method stub
-
-        }};*/
 
     Camera.PictureCallback myPictureCallback_JPG = new Camera.PictureCallback(){
 
         @Override
         public void onPictureTaken(byte[] arg0, Camera arg1) {
-            /*Bitmap bitmapPicture
-                    = BitmapFactory.decodeByteArray(arg0, 0, arg0.length);*/
-            // Uri uriTarget = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, new ContentValues());
-            /*String fileName = Environment.getExternalStorageDirectory().toString()+"image.jpg";
-            File f = new File(fileName);
-            Uri uriTarget = Uri.fromFile(f);
-            OutputStream imageFileOS;
-            Time time = new Time();
-            time.setToNow();
-            try {
-                imageFileOS = getContentResolver().openOutputStream(uriTarget);
-                imageFileOS.write(arg0);
-                imageFileOS.flush();
-                imageFileOS.close();
-                Toast.makeText(FiltersActivity.this, "Image saved: " + uriTarget.toString(), Toast.LENGTH_LONG).show();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }*/
             File pictureFile = getOutputMediaFile();
             if (pictureFile == null) {
                 return;
@@ -259,6 +269,7 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
             } catch (IOException e) {
             }
             camera.startPreview();
+            viewControl.setVisibility(View.VISIBLE);
         }
         };
 
@@ -332,12 +343,22 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
     public void surfaceCreated(SurfaceHolder holder) {
 // TODO Auto-generated method stub
         camera = Camera.open();
+        try {
+            if(!mInitSuccessful)
+                initRecorder(surfaceHolder.getSurface());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
 // TODO Auto-generated method stub
+        mMediaRecorder.reset();
+        mMediaRecorder.release();
+        mMediaRecorder = null;
+
         camera.stopPreview();
         camera.release();
         camera = null;

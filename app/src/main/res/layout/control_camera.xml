@@ -1,14 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent"
-    android:gravity="center">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <Button
-        android:id="@+id/takepicture"
+        android:id="@+id/takePictureBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text=" * Take Picture "
-        android:layout_gravity="right"
-        android:layout_margin="100px"
-        />
-</LinearLayout>
+        android:text=" take picture "
+        android:layout_margin="120dp"
+        android:background="@drawable/roundrect"
+        android:contentDescription="Round Image View"
+        tools:ignore="HardcodedText" />
+
+    <Button
+        android:id="@+id/recordBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="record  "
+        android:layout_margin="5dp"
+        android:background="@drawable/roundrect"
+        android:contentDescription="Round Image View"
+        tools:ignore="HardcodedText" />
+
+    <Button
+        android:id="@+id/stopRecordBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="stop  "
+        android:layout_margin="60dp"
+        android:background="@drawable/roundrect"
+        android:contentDescription="Round Image View"
+        tools:ignore="HardcodedText" />
+
+
+
+</RelativeLayout>
