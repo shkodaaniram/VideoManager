@@ -31,6 +31,7 @@ import android.support.v7.widget.RecyclerView;
 import android.text.format.Time;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -383,18 +384,27 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
         actionBar.setDisplayShowHomeEnabled(false);
         actionBar.setDisplayShowTitleEnabled(false);*/
 
+
         boolean isNetworkAvailable = isNetworkAvaliable();
-        MenuItem shareMenuItem = menu.findItem(R.id.shareItm);
-        MenuItem fromAccountItem = menu.findItem(R.id.fromAccountItm);
-        shareMenuItem.setVisible(isNetworkAvailable);
-        fromAccountItem.setVisible(isNetworkAvailable);
+        menu.findItem(R.id.shareItm).setVisible(isNetworkAvailable);
+        menu.findItem(R.id.fromAccountItm).setVisible(isNetworkAvailable);
         //FiltersActivity.this.invalidateOptionsMenu();
 
         return true;
     }
 
-
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {  //?????????????
+        //menu.clear();
+        //invalidateOptionsMenu();
+        //onCreateOptionsMenu(menu);
+        boolean isNetworkAvailable = isNetworkAvaliable();
+        menu.findItem(R.id.fromAccountItm).setVisible(isNetworkAvailable);
+        menu.findItem(R.id.shareItm).setVisible(isNetworkAvailable);
+        return true;//super.onPrepareOptionsMenu(menu);
+    }
+
+   /* @Override
     public void invalidateOptionsMenu() {
         super.invalidateOptionsMenu();
         BroadcastReceiver broadcastReceiver = new BroadcastReceiver(){
@@ -415,7 +425,7 @@ public class FiltersActivity extends ActionBarActivity implements OnClickListene
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION);
         registerReceiver(broadcastReceiver, intentFilter);
-    }
+    }*/
 
     private void playingVideo(Uri uri){
         progressDialog = new ProgressDialog(FiltersActivity.this);
